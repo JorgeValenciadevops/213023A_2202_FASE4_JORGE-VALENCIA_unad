@@ -1,0 +1,7 @@
+=== RESERVATION MANAGER - LOG DE EVENTOS ===
+Iniciado: 2026-06-30 20:54:08
+==================================================
+
+[EVENTO] [2026-06-30 20:54:08] Interfaz gráfica iniciada
+[EVENTO] [2026-06-30 21:51:57] Cliente registrado: jorge (ID: 1)
+[ERROR] [2026-06-30 21:52:59] Cliente 2939 no existe o no está activo
