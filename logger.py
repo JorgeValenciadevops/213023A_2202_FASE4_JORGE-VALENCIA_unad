@@ -6,10 +6,12 @@ Mantiene un archivo log con timestamps para seguimiento de actividades.
 """
 
 from datetime import datetime
+from pathlib import Path
 import os
 
 # Archivo de log
-LOG_FILE = "reservation_manager.log"
+BASE_DIR = Path(__file__).resolve().parent
+LOG_FILE = str(BASE_DIR / "reservation_manager.log")
 
 def _crear_archivo_log():
     """Crea el archivo de log si no existe."""

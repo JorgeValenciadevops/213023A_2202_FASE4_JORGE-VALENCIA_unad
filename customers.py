@@ -12,6 +12,34 @@ Funciones para:
 from data import clientes, id_cliente_contador
 import logger
 
+
+def validar_datos_cliente(nombre, email, telefono):
+    """Valida los datos de un cliente antes de registrarlo."""
+    nombre_limpio = (nombre or "").strip()
+    email_limpio = (email or "").strip()
+    telefono_limpio = (telefono or "").strip()
+
+    if not nombre_limpio:
+        raise ValueError("El campo nombre no puede estar vacío. Ingrese su nombre completo usando solo letras.")
+
+    if not all(car.isalpha() or car.isspace() for car in nombre_limpio):
+        raise ValueError("El campo nombre solo puede contener letras y espacios. Por favor, no ingrese números ni caracteres especiales.")
+
+    if not email_limpio:
+        raise ValueError("El campo Email no puede estar vacío. Ingrese un correo válido.")
+
+    if "@" not in email_limpio or "." not in email_limpio.split("@", 1)[1]:
+        raise ValueError("El campo Email no es válido. Ejemplo: nombre@dominio.com")
+
+    if not telefono_limpio:
+        raise ValueError("El campo Teléfono no puede estar vacío. Ingrese solo números.")
+
+    if not telefono_limpio.isdigit():
+        raise ValueError("El campo Teléfono solo puede contener números. Evite letras, espacios o signos.")
+
+    return nombre_limpio, email_limpio, telefono_limpio
+
+
 def registrar_cliente(nombre, email, telefono):
     """
     Registra un nuevo cliente.
@@ -25,23 +53,28 @@ def registrar_cliente(nombre, email, telefono):
         int: ID del cliente registrado o -1 si hay error
     """
     try:
-        if not validar_cliente_nuevo(nombre, email, telefono):
-            logger.registrar_error(f"Validación fallida para cliente: {nombre}")
+        nombre_limpio, email_limpio, telefono_limpio = validar_datos_cliente(nombre, email, telefono)
+
+        if not validar_cliente_nuevo(nombre_limpio, email_limpio, telefono_limpio):
+            logger.registrar_error(f"Validación fallida para cliente: {nombre_limpio}")
             return -1
         
         from data import id_cliente_contador as contador
         nuevo_id = contador
         
         clientes[nuevo_id] = {
-            "nombre": nombre,
-            "email": email,
-            "telefono": telefono,
+            "nombre": nombre_limpio,
+            "email": email_limpio,
+            "telefono": telefono_limpio,
             "activo": True
         }
         
-        logger.registrar_evento(f"Cliente registrado: {nombre} (ID: {nuevo_id})")
+        logger.registrar_evento(f"Cliente registrado: {nombre_limpio} (ID: {nuevo_id})")
         return nuevo_id
     
+    except ValueError as e:
+        logger.registrar_advertencia(f"Validación de cliente fallida: {str(e)}")
+        raise
     except Exception as e:
         logger.registrar_error(f"Error al registrar cliente: {str(e)}")
         return -1

@@ -11,10 +11,40 @@ Gestiona:
 
 import tkinter as tk
 from tkinter import ttk, messagebox
+from datetime import datetime, date
+  
+try:
+    from tkcalendar import DateEntry
+except ImportError:
+    DateEntry = None
+
 import customers
 import services
 import reservations
 import logger
+
+
+def formatear_fecha_hora_seleccionada(fecha, hora, minuto, meridiem):
+    """Convierte una fecha y hora seleccionadas a formato de reserva."""
+    if hasattr(fecha, "strftime"):
+        fecha_obj = fecha
+    else:
+        fecha_obj = datetime.strptime(str(fecha), "%Y-%m-%d").date()
+
+    hora_valor = int(hora)
+    if meridiem == "PM" and hora_valor != 12:
+        hora_valor += 12
+    elif meridiem == "AM" and hora_valor == 12:
+        hora_valor = 0
+
+    return datetime(
+        fecha_obj.year,
+        fecha_obj.month,
+        fecha_obj.day,
+        hora_valor,
+        int(minuto)
+    ).strftime("%Y-%m-%d %H:%M")
+
 
 class ReservationManagerUI:
     """Interfaz gráfica principal del Reservation Manager"""
@@ -127,15 +157,21 @@ class ReservationManagerUI:
         entry_telefono.grid(row=2, column=1, pady=5)
         
         def guardar():
-            nombre = entry_nombre.get()
-            email = entry_email.get()
-            telefono = entry_telefono.get()
-            
-            if customers.registrar_cliente(nombre, email, telefono) != -1:
-                messagebox.showinfo("Éxito", "Cliente registrado correctamente")
-                self._mostrar_clientes()
-            else:
-                messagebox.showerror("Error", "No se pudo registrar el cliente")
+            try:
+                nombre = entry_nombre.get()
+                email = entry_email.get()
+                telefono = entry_telefono.get()
+
+                if customers.registrar_cliente(nombre, email, telefono) != -1:
+                    messagebox.showinfo("Éxito", "Cliente registrado correctamente")
+                    self._mostrar_clientes()
+                else:
+                    messagebox.showerror("Error", "No se pudo registrar el cliente")
+            except ValueError as error:
+                messagebox.showwarning("Validación", str(error))
+            except Exception as error:
+                logger.registrar_error(f"Error inesperado al registrar cliente: {error}")
+                messagebox.showerror("Error", "Ocurrió un error inesperado. Intente nuevamente.")
         
         ttk.Button(frame_form, text="Guardar", command=guardar).grid(row=3, column=0, pady=15)
         ttk.Button(frame_form, text="Volver", command=self._mostrar_inicio).grid(row=3, column=1)
@@ -192,8 +228,12 @@ class ReservationManagerUI:
         frame_lista.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         
         for id_item, datos in items.items():
-            ttk.Label(frame_lista, text=f"ID: {id_item} - {datos['nombre']}", 
-                     font=("Arial", 11)).pack(anchor="w", pady=5)
+            precio = datos.get("precio_hora") or datos.get("precio_dia") or datos.get("precio")
+            if precio is not None:
+                etiqueta = f"ID: {id_item} - {datos['nombre']} - Precio: ${precio:,.0f}"
+            else:
+                etiqueta = f"ID: {id_item} - {datos['nombre']}"
+            ttk.Label(frame_lista, text=etiqueta, font=("Arial", 11)).pack(anchor="w", pady=5)
         
         ttk.Button(self.frame_principal, text="Volver", 
                    command=self._mostrar_inicio).pack(pady=10)
@@ -213,20 +253,48 @@ class ReservationManagerUI:
         entry_cliente.grid(row=0, column=1, pady=5)
         
         ttk.Label(frame_form, text="Tipo Servicio:").grid(row=1, column=0, sticky="w", pady=5)
-        combo_tipo = ttk.Combobox(frame_form, values=["sala", "equipo", "servicio"], width=27)
+        combo_tipo = ttk.Combobox(frame_form, values=["sala", "equipo", "servicio"], width=27, state="readonly")
+        combo_tipo.current(0)
         combo_tipo.grid(row=1, column=1, pady=5)
         
         ttk.Label(frame_form, text="ID Servicio:").grid(row=2, column=0, sticky="w", pady=5)
         entry_servicio = ttk.Entry(frame_form, width=30)
         entry_servicio.grid(row=2, column=1, pady=5)
         
-        ttk.Label(frame_form, text="Fecha Inicio (YYYY-MM-DD HH:MM):").grid(row=3, column=0, sticky="w", pady=5)
-        entry_inicio = ttk.Entry(frame_form, width=30)
-        entry_inicio.grid(row=3, column=1, pady=5)
-        
-        ttk.Label(frame_form, text="Fecha Fin (YYYY-MM-DD HH:MM):").grid(row=4, column=0, sticky="w", pady=5)
-        entry_fin = ttk.Entry(frame_form, width=30)
-        entry_fin.grid(row=4, column=1, pady=5)
+        def crear_selector_fecha_hora(row, texto):
+            ttk.Label(frame_form, text=texto).grid(row=row, column=0, sticky="w", pady=5)
+            selector_frame = ttk.Frame(frame_form)
+            selector_frame.grid(row=row, column=1, sticky="w", pady=5)
+
+            if DateEntry is not None:
+                fecha_widget = DateEntry(selector_frame, width=18, date_pattern="yyyy-mm-dd")
+                fecha_widget.set_date(date.today())
+                fecha_widget.pack(side=tk.LEFT)
+            else:
+                fecha_widget = ttk.Entry(selector_frame, width=18)
+                fecha_widget.insert(0, date.today().strftime("%Y-%m-%d"))
+                fecha_widget.pack(side=tk.LEFT)
+
+            horas = [f"{i:02d}" for i in range(1, 13)]
+            minutos = [f"{i:02d}" for i in range(60)]
+            combo_hora = ttk.Combobox(selector_frame, values=horas, width=5, state="readonly")
+            combo_hora.current(0)
+            combo_hora.pack(side=tk.LEFT, padx=(5, 0))
+
+            ttk.Label(selector_frame, text=":").pack(side=tk.LEFT)
+
+            combo_minuto = ttk.Combobox(selector_frame, values=minutos, width=5, state="readonly")
+            combo_minuto.current(0)
+            combo_minuto.pack(side=tk.LEFT)
+
+            combo_meridiem = ttk.Combobox(selector_frame, values=["AM", "PM"], width=5, state="readonly")
+            combo_meridiem.current(0)
+            combo_meridiem.pack(side=tk.LEFT, padx=(5, 0))
+
+            return fecha_widget, combo_hora, combo_minuto, combo_meridiem
+
+        fecha_inicio_widget, combo_inicio_hora, combo_inicio_minuto, combo_inicio_meridiem = crear_selector_fecha_hora(3, "Fecha y hora inicio:")
+        fecha_fin_widget, combo_fin_hora, combo_fin_minuto, combo_fin_meridiem = crear_selector_fecha_hora(4, "Fecha y hora fin:")
         
         ttk.Label(frame_form, text="Cantidad/Duración:").grid(row=5, column=0, sticky="w", pady=5)
         entry_cantidad = ttk.Entry(frame_form, width=30)
@@ -235,12 +303,25 @@ class ReservationManagerUI:
         
         def guardar():
             try:
+                fecha_inicio = formatear_fecha_hora_seleccionada(
+                    fecha_inicio_widget.get_date() if hasattr(fecha_inicio_widget, "get_date") else fecha_inicio_widget.get(),
+                    combo_inicio_hora.get(),
+                    combo_inicio_minuto.get(),
+                    combo_inicio_meridiem.get()
+                )
+                fecha_fin = formatear_fecha_hora_seleccionada(
+                    fecha_fin_widget.get_date() if hasattr(fecha_fin_widget, "get_date") else fecha_fin_widget.get(),
+                    combo_fin_hora.get(),
+                    combo_fin_minuto.get(),
+                    combo_fin_meridiem.get()
+                )
+
                 id_reserva = reservations.crear_reserva(
                     int(entry_cliente.get()),
                     combo_tipo.get(),
                     int(entry_servicio.get()),
-                    entry_inicio.get(),
-                    entry_fin.get(),
+                    fecha_inicio,
+                    fecha_fin,
                     int(entry_cantidad.get())
                 )
                 
@@ -249,8 +330,12 @@ class ReservationManagerUI:
                     self._mostrar_reservas()
                 else:
                     messagebox.showerror("Error", "No se pudo crear la reserva")
-            except ValueError:
-                messagebox.showerror("Error", "Datos inválidos")
+            except ValueError as error:
+                logger.registrar_advertencia(f"Reserva inválida: {error}")
+                messagebox.showwarning("Validación", str(error))
+            except Exception as error:
+                logger.registrar_error(f"Error inesperado al crear reserva: {error}")
+                messagebox.showerror("Error", "Ocurrió un error inesperado al crear la reserva.")
         
         ttk.Button(frame_form, text="Guardar", command=guardar).grid(row=6, column=0, pady=15)
         ttk.Button(frame_form, text="Volver", command=self._mostrar_inicio).grid(row=6, column=1)

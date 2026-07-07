@@ -7,10 +7,31 @@ Funciones para:
 - Consultar reservas
 """
 
+from datetime import datetime
+
 from data import reservas, id_reserva_contador
 from customers import validar_cliente_existente
 from services import sala_disponible, equipo_disponible, calcular_precio
 import logger
+
+
+def validar_rango_fechas(fecha_inicio, fecha_fin):
+    """Valida que la fecha de fin sea mayor que la de inicio."""
+    if isinstance(fecha_inicio, str):
+        fecha_inicio_dt = datetime.strptime(fecha_inicio, "%Y-%m-%d %H:%M")
+    else:
+        fecha_inicio_dt = fecha_inicio
+
+    if isinstance(fecha_fin, str):
+        fecha_fin_dt = datetime.strptime(fecha_fin, "%Y-%m-%d %H:%M")
+    else:
+        fecha_fin_dt = fecha_fin
+
+    if fecha_fin_dt <= fecha_inicio_dt:
+        raise ValueError("La fecha de fin debe ser mayor que la fecha de inicio.")
+
+    return True
+
 
 def crear_reserva(id_cliente, tipo_servicio, id_servicio, fecha_inicio, fecha_fin, cantidad=1):
     """
@@ -28,6 +49,8 @@ def crear_reserva(id_cliente, tipo_servicio, id_servicio, fecha_inicio, fecha_fi
         int: ID de la reserva o -1 si hay error
     """
     try:
+        validar_rango_fechas(fecha_inicio, fecha_fin)
+
         # Validar cliente
         if not validar_cliente_existente(id_cliente):
             logger.registrar_error(f"Cliente {id_cliente} no existe o no está activo")

@@ -5,3 +5,40 @@ Iniciado: 2026-06-30 20:54:08
 [EVENTO] [2026-06-30 20:54:08] Interfaz gráfica iniciada
 [EVENTO] [2026-06-30 21:51:57] Cliente registrado: jorge (ID: 1)
 [ERROR] [2026-06-30 21:52:59] Cliente 2939 no existe o no está activo
+[EVENTO] [2026-07-05 20:47:02] Interfaz gráfica iniciada
+[EVENTO] [2026-07-05 20:49:17] Cliente registrado: Pedro Leal (ID: 1)
+[EVENTO] [2026-07-05 20:50:43] Reserva creada: ID 1, Cliente 1, sala 1
+[EVENTO] [2026-07-05 21:50:14] Interfaz gráfica iniciada
+[EVENTO] [2026-07-05 22:02:23] Interfaz gráfica iniciada
+[EVENTO] [2026-07-05 22:12:31] Interfaz gráfica iniciada
+[EVENTO] [2026-07-05 22:32:14] Interfaz gráfica iniciada
+[EVENTO] [2026-07-05 22:32:58] Interfaz gráfica iniciada
+[EVENTO] [2026-07-05 22:42:15] Interfaz gráfica iniciada
+[EVENTO] [2026-07-05 22:42:32] Interfaz gráfica iniciada
+[EVENTO] [2026-07-05 22:42:50] Interfaz gráfica iniciada
+[ADVERTENCIA] [2026-07-05 22:44:07] Email inválido: adfasll
+[ERROR] [2026-07-05 22:44:07] Validación fallida para cliente: Andres Correa 544
+[EVENTO] [2026-07-05 22:44:26] Cliente registrado: Andres Correa 544 (ID: 1)
+[EVENTO] [2026-07-05 22:51:47] Interfaz gráfica iniciada
+[ERROR] [2026-07-05 22:52:13] Error al registrar cliente: El nombre solo puede contener letras.
+[ERROR] [2026-07-05 22:52:24] Error al registrar cliente: El Teléfono solo puede contener números.
+[ERROR] [2026-07-05 22:52:30] Error al registrar cliente: El Teléfono solo puede contener números.
+[ERROR] [2026-07-05 22:52:38] Error al registrar cliente: El Teléfono solo puede contener números.
+[EVENTO] [2026-07-05 22:52:46] Cliente registrado: pedro (ID: 1)
+[EVENTO] [2026-07-05 23:09:33] Interfaz gráfica iniciada
+[ADVERTENCIA] [2026-07-05 23:10:23] Validación de cliente fallida: El campo nombre solo puede contener letras. Por favor, no ingrese números ni caracteres especiales.
+[ADVERTENCIA] [2026-07-05 23:10:49] Validación de cliente fallida: El campo nombre solo puede contener letras. Por favor, no ingrese números ni caracteres especiales.
+[ADVERTENCIA] [2026-07-05 23:11:04] Validación de cliente fallida: El campo nombre solo puede contener letras. Por favor, no ingrese números ni caracteres especiales.
+[ADVERTENCIA] [2026-07-05 23:11:20] Validación de cliente fallida: El campo nombre solo puede contener letras. Por favor, no ingrese números ni caracteres especiales.
+[EVENTO] [2026-07-05 23:11:30] Cliente registrado: jorgevalenciaRodriguez (ID: 1)
+[EVENTO] [2026-07-05 23:12:58] Interfaz gráfica iniciada
+[EVENTO] [2026-07-05 23:13:12] Interfaz gráfica iniciada
+[ADVERTENCIA] [2026-07-05 23:13:37] Validación de cliente fallida: El campo Email no es válido. Ejemplo: nombre@dominio.com
+[ADVERTENCIA] [2026-07-05 23:13:53] Validación de cliente fallida: El campo Teléfono solo puede contener números. Evite letras, espacios o signos.
+[ADVERTENCIA] [2026-07-05 23:14:10] Validación de cliente fallida: El campo Teléfono solo puede contener números. Evite letras, espacios o signos.
+[ADVERTENCIA] [2026-07-05 23:14:18] Validación de cliente fallida: El campo Teléfono solo puede contener números. Evite letras, espacios o signos.
+[EVENTO] [2026-07-05 23:14:25] Cliente registrado: jorge valencia R (ID: 1)
+[EVENTO] [2026-07-05 23:15:15] Reserva creada: ID 1, Cliente 1, sala 1
+[EVENTO] [2026-07-05 23:21:45] Interfaz gráfica iniciada
+[ERROR] [2026-07-05 23:28:08] Error al crear reserva: La fecha de fin debe ser mayor que la fecha de inicio.
+[EVENTO] [2026-07-06 22:44:26] Interfaz gráfica iniciada
